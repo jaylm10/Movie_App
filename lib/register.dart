@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movie/login.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -33,9 +32,10 @@ class _RegisterState extends State<Register> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('You must accept Terms & Conditions')),
       );
+      return;
     }
 
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Login()));
+    Navigator.pop(context);
   }
 
   @override
@@ -93,7 +93,7 @@ class _RegisterState extends State<Register> {
                         borderSide: const BorderSide(color: Color(0xFFCF2030), width: 2),
                       ),
                     ),
-                    value: selectedValue,
+                    initialValue: selectedValue,
                     items: role.map((item) {
                       return DropdownMenuItem(value: item, child: Text(item));
                     }).toList(),
