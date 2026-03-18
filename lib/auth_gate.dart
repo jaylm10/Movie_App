@@ -12,25 +12,28 @@ class AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<AuthGate> {
-
   @override
   void initState() {
-    
     super.initState();
     context.read<AuthBloc>().add(CheckLoginStatusEvent());
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc,AuthState>(listener: (context,state){
-          if (state is Authenticated){
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Home()));
-          } 
-           if(state is Unauthenticated){
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Login()));
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is Authenticated){
+          return const Home();
+        }
 
-          }
-    });
+        if (state is Unauthenticated){
+          return const Login();
+        }
+
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      },
+    );
   }
 }

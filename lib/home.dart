@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:movie/homePage.dart';
+import 'package:movie/profile.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -12,10 +14,12 @@ class _HomeState extends State<Home> {
    int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    Center(child: Text("Home Page")),
+    const HomePage(),
     Center(child: Text("Category Page")),
-    Center(child: Text("Profile Page")),
+    const ProfilePage(),
   ];
+
+  
 
 
   @override
@@ -35,6 +39,7 @@ class _HomeState extends State<Home> {
       ),
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
+        
         currentIndex: _currentIndex,
         onTap: (value) {
           setState(() {
