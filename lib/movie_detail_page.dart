@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie/bloc/favMovie/fav_movie_bloc.dart';
+import 'package:movie/model/movie.dart';
 
 class MovieDetailPage extends StatelessWidget {
-  final dynamic movie;
+  final Movie movie;
 
   const MovieDetailPage({super.key, required this.movie});
 
@@ -11,7 +14,22 @@ class MovieDetailPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(movie.title,style: TextStyle(color: Colors.white),),
         backgroundColor: Colors.red,
-        
+        actions: [
+          BlocBuilder<FavMovieBloc, FavMovieState>(
+            builder: (context, state) {
+              final favorites = state is FavMovieLoaded ? state.movies : <Movie>[];
+              final isFavorite = favorites.any((item) => item.id == movie.id);
+
+              return IconButton(
+                onPressed: () {
+                  context.read<FavMovieBloc>().add(ToggleMovie(movie));
+                },
+                icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+                color: Colors.white,
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -70,7 +88,7 @@ class MovieDetailPage extends StatelessWidget {
                   const SizedBox(height: 6),
 
                   Text(
-                    movie.overview ?? "No description available",
+                    movie.overview,
                     style: const TextStyle(color: Colors.black87),
                   ),
 
@@ -81,7 +99,7 @@ class MovieDetailPage extends StatelessWidget {
                     children: [
                       const Text("Language: ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text(movie.lan ?? "N/A"),
+                      Text(movie.lan),
                     ],
                   ),
 
@@ -92,7 +110,7 @@ class MovieDetailPage extends StatelessWidget {
                     children: [
                       const Text("Release Date: ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text(movie.rel_date ?? "N/A"),
+                      Text(movie.rel_date),
                     ],
                   ),
                 ],

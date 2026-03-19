@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:movie/auth_gate.dart';
 import 'package:movie/bloc/auth/auth_bloc.dart';
+import 'package:movie/bloc/favMovie/fav_movie_bloc.dart';
 import 'package:movie/bloc/movie/movie_bloc.dart';
 import 'package:movie/bloc/profile/profile_bloc.dart';
 import 'package:movie/repository/movie_repo.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => AuthBloc(authService: AuthService())),
         BlocProvider(create: (context) => MovieBloc(MovieRepository(MovieApiService()))),
         BlocProvider(create: (context) => ProfileBloc(ProfileService())),
+        BlocProvider(create: (context) => FavMovieBloc()),
 
       ],
       child: MaterialApp(title: 'Movie', home: AuthGate()),

@@ -23,6 +23,8 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     FetchMovies event,
     Emitter<MovieState> emit,
   ) async {
+    page = 1;
+    isFetching = false;
     emit(MovieLoading());
 
     try {

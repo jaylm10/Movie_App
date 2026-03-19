@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie/bloc/favMovie/fav_movie_bloc.dart';
 import 'package:movie/bloc/movie/movie_bloc.dart';
+import 'package:movie/model/movie.dart';
 import 'package:movie/movie_detail_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,6 +14,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
+
+  Future<void> _onRefresh() async {
+    final movieBloc = context.read<MovieBloc>();
+    movieBloc.add(FetchMovies());
+    await movieBloc.stream.firstWhere((state) => state is! MovieLoading);
+  }
 
   @override
   void initState() {
@@ -42,31 +50,45 @@ class _HomePageState extends State<HomePage> {
         }
 
         if (state is MovieLoaded) {
-          return GridView.builder(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(12),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.7, 
+          return RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: GridView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(12),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.7,
+              ),
+              itemCount: state.movies.length + 1,
+              itemBuilder: (context, index) {
+                if (index < state.movies.length) {
+                  final movie = state.movies[index];
+                  return MovieCard(movie: movie);
+                } else {
+                  return state.hasReachedMax
+                      ? const SizedBox()
+                      : const Center(child: CircularProgressIndicator());
+                }
+              },
             ),
-            itemCount: state.movies.length + 1,
-            itemBuilder: (context, index) {
-              if (index < state.movies.length) {
-                final movie = state.movies[index];
-                return MovieCard(movie: movie);
-              } else {
-                return state.hasReachedMax
-                    ? const SizedBox()
-                    : const Center(child: CircularProgressIndicator());
-              }
-            },
           );
         }
 
         if (state is MovieError) {
-          return Center(child: Text(state.message));
+          return RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: Center(child: Text(state.message)),
+                ),
+              ],
+            ),
+          );
         }
 
         return const SizedBox();
@@ -76,7 +98,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class MovieCard extends StatelessWidget {
-  final dynamic movie;
+  final Movie movie;
 
   const MovieCard({super.key, required this.movie});
 
@@ -115,16 +137,27 @@ class MovieCard extends StatelessWidget {
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.favorite_border),
-                        color: Colors.red,
-                        onPressed: () {},
-                      ),
+                    child: BlocBuilder<FavMovieBloc, FavMovieState>(
+                      builder: (context, state) {
+                        final favorites = state is FavMovieLoaded ? state.movies : <Movie>[];
+                        final isFavorite = favorites.any((item) => item.id == movie.id);
+
+                        return Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                              isFavorite ? Icons.favorite : Icons.favorite_border,
+                            ),
+                            color: Colors.red,
+                            onPressed: () {
+                              context.read<FavMovieBloc>().add(ToggleMovie(movie));
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
