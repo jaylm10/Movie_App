@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie/auth_gate.dart';
+import 'package:movie/bloc/auth/auth_bloc.dart';
 import 'package:movie/bloc/profile/profile_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:movie/login.dart';
 import 'package:movie/fav_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -56,14 +57,14 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  
   Future<void> deleteAccount() async {
     context.read<ProfileBloc>().add(DeleteAccountEvent());
+    context.read<AuthBloc>().add(LogoutEvent());
 
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const Login()),
+      MaterialPageRoute(builder: (_) => const AuthGate()),
       (route) => false,
     );
   }
@@ -76,9 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
         enabled: isEditing,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
@@ -95,9 +94,12 @@ class _ProfilePageState extends State<ProfilePage> {
           mobileController.text = state.mobile.isNotEmpty
               ? state.mobile
               : mobileController.text;
-          emailController.text =
-              state.email.isNotEmpty ? state.email : emailController.text;
-          bioController.text = state.bio.isNotEmpty ? state.bio : bioController.text;
+          emailController.text = state.email.isNotEmpty
+              ? state.email
+              : emailController.text;
+          bioController.text = state.bio.isNotEmpty
+              ? state.bio
+              : bioController.text;
 
           if (isEditing) {
             setState(() {
@@ -107,6 +109,11 @@ class _ProfilePageState extends State<ProfilePage> {
         }
       },
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Profile', style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.red,
+          centerTitle: true,
+        ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -143,9 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const FavPage(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const FavPage()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -158,7 +163,37 @@ class _ProfilePageState extends State<ProfilePage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: deleteAccount,
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Delete Account"),
+                          content: const Text(
+                            "Are you sure you want to delete your account? This action cannot be undone.",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text(
+                                "No",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text(
+                                "Yes",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true) {
+                        deleteAccount();
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey,
                     ),
