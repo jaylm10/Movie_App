@@ -9,7 +9,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
 
   AuthBloc({required this.authService}) :super(AuthInitial()){
     on<SubmitEvent>((event, emit) async{
-      await authService.storeToken();
+      await authService.storeToken(event.email);
       emit(Authenticated());
     },);
 

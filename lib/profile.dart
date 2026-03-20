@@ -120,10 +120,58 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                buildField("Name", nameController),
-                buildField("Mobile", mobileController),
-                buildField("Email", emailController),
-                buildField("Bio", bioController),
+                
+
+                TextField(
+                  controller: nameController,
+                  enabled: isEditing,
+                  decoration: InputDecoration(
+                    labelText: "Name",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                TextField(
+                  keyboardType:TextInputType.phone,
+                  controller: mobileController,
+                  enabled: isEditing,
+                  decoration: InputDecoration(
+                    labelText: "Mobile",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: emailController,
+                  enabled: false,
+                  decoration: InputDecoration(
+                    labelText: "Email",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: bioController,
+                  enabled: isEditing,
+                  decoration: InputDecoration(
+                    labelText: "Bio",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+
+                // buildField("Name", nameController),
+                // buildField("Mobile", mobileController),
+                // buildField("Email", emailController),
+                // buildField("Bio", bioController),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,

@@ -23,8 +23,10 @@ class _LoginState extends State<Login> {
       return;
     }
 
+    final String email = _email.text;
+
     // print("Login Success");
-    context.read<AuthBloc>().add(SubmitEvent());
+    context.read<AuthBloc>().add(SubmitEvent(email));
     
   }
 

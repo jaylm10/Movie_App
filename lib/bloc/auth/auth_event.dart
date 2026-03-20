@@ -3,6 +3,9 @@ part of 'auth_bloc.dart';
 sealed class AuthEvent {}
 
 final class SubmitEvent extends AuthEvent{
+  final String email;
+
+  SubmitEvent(this.email);
   
 }
 

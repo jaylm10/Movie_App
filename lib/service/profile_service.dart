@@ -24,8 +24,8 @@ class ProfileService {
     return {
       'name': pref.getString('name') ?? '',
       'mobile': pref.getString('mobile') ?? '',
-      'address': pref.getString('email') ?? '',
-      'date': pref.getString('bio') ?? '',
+      'email': pref.getString('email') ?? '',
+      'bio': pref.getString('bio') ?? '',
     };
   }
 
