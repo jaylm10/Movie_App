@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie/category.dart';
 import 'package:movie/homePage.dart';
 import 'package:movie/profile.dart';
 
@@ -15,7 +16,7 @@ class _HomeState extends State<Home> {
 
   final List<Widget> _pages = [
     const HomePage(),
-    Center(child: Text("Category Page")),
+    const Category(),
     const ProfilePage(),
   ];
 
@@ -25,19 +26,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Movies',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        backgroundColor: Colors.red,
-        centerTitle: true,
-      ),
-      body: _pages[_currentIndex],
+      
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: BottomNavigationBar(
         
         currentIndex: _currentIndex,

@@ -10,8 +10,13 @@ class MovieLoading extends MovieState {}
 class MovieLoaded extends MovieState {
   final List<Movie> movies;
   final bool hasReachedMax;
+  final bool isLoadingMore;
 
-  MovieLoaded(this.movies, {this.hasReachedMax = false});
+  MovieLoaded(
+    this.movies, {
+    this.hasReachedMax = false,
+    this.isLoadingMore = false,
+  });
 }
 
 class MovieError extends MovieState {

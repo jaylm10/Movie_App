@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _onRefresh() async {
     final movieBloc = context.read<MovieBloc>();
-    movieBloc.add(FetchMovies());
+    movieBloc.add(FetchMovies(forceRefresh: true));
     await movieBloc.stream.firstWhere((state) => state is! MovieLoading);
   }
 
@@ -43,56 +43,76 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MovieBloc, MovieState>(
-      builder: (context, state) {
-        if (state is MovieLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Movies',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        backgroundColor: Colors.red,
+        centerTitle: true,
+      ),
+      body: BlocBuilder<MovieBloc, MovieState>(
+        builder: (context, state) {
+          if (state is MovieLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        if (state is MovieLoaded) {
-          return RefreshIndicator(
-            onRefresh: _onRefresh,
-            child: GridView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(12),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 0.7,
+          if (state is MovieLoaded) {
+            return RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: Stack(
+                children: [
+                  GridView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 90),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.7,
+                        ),
+                    itemCount: state.movies.length,
+                    itemBuilder: (context, index) {
+                      final movie = state.movies[index];
+                      return MovieCard(movie: movie);
+                    },
+                  ),
+                  if (state.isLoadingMore)
+                    const Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 16,
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                ],
               ),
-              itemCount: state.movies.length + 1,
-              itemBuilder: (context, index) {
-                if (index < state.movies.length) {
-                  final movie = state.movies[index];
-                  return MovieCard(movie: movie);
-                } else {
-                  return state.hasReachedMax
-                      ? const SizedBox()
-                      : const Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
-          );
-        }
+            );
+          }
 
-        if (state is MovieError) {
-          return RefreshIndicator(
-            onRefresh: _onRefresh,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  child: Center(child: Text(state.message)),
-                ),
-              ],
-            ),
-          );
-        }
+          if (state is MovieError) {
+            return RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    child: Center(child: Text(state.message)),
+                  ),
+                ],
+              ),
+            );
+          }
 
-        return const SizedBox();
-      },
+          return const SizedBox();
+        },
+      ),
     );
   }
 }
@@ -106,19 +126,27 @@ class MovieCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>MovieDetailPage(movie: movie)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MovieDetailPage(movie: movie),
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 4)),
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 4),
+            ),
           ],
         ),
         child: Column(
           children: [
-             
             Expanded(
               child: Stack(
                 children: [
@@ -132,15 +160,18 @@ class MovieCard extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-      
-                 
+
                   Positioned(
                     top: 8,
                     right: 8,
                     child: BlocBuilder<FavMovieBloc, FavMovieState>(
                       builder: (context, state) {
-                        final favorites = state is FavMovieLoaded ? state.movies : <Movie>[];
-                        final isFavorite = favorites.any((item) => item.id == movie.id);
+                        final favorites = state is FavMovieLoaded
+                            ? state.movies
+                            : <Movie>[];
+                        final isFavorite = favorites.any(
+                          (item) => item.id == movie.id,
+                        );
 
                         return Container(
                           decoration: const BoxDecoration(
@@ -149,11 +180,15 @@ class MovieCard extends StatelessWidget {
                           ),
                           child: IconButton(
                             icon: Icon(
-                              isFavorite ? Icons.favorite : Icons.favorite_border,
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
                             ),
                             color: Colors.red,
                             onPressed: () {
-                              context.read<FavMovieBloc>().add(ToggleMovie(movie));
+                              context.read<FavMovieBloc>().add(
+                                ToggleMovie(movie),
+                              );
                             },
                           ),
                         );
@@ -163,8 +198,7 @@ class MovieCard extends StatelessWidget {
                 ],
               ),
             ),
-      
-           
+
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               child: Row(
@@ -178,9 +212,9 @@ class MovieCard extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
-      
+
                   const SizedBox(width: 6),
-      
+
                   Row(
                     children: [
                       const Icon(Icons.star, color: Colors.amber, size: 16),

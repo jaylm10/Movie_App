@@ -23,6 +23,10 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     FetchMovies event,
     Emitter<MovieState> emit,
   ) async {
+    if (state is MovieLoaded && !event.forceRefresh) {
+      return;
+    }
+
     page = 1;
     isFetching = false;
     emit(MovieLoading());
@@ -45,22 +49,43 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
       if (currentState.hasReachedMax) return;
 
       isFetching = true;
+      emit(
+        MovieLoaded(
+          currentState.movies,
+          hasReachedMax: currentState.hasReachedMax,
+          isLoadingMore: true,
+        ),
+      );
       page++;
 
       try {
         final newMovies = await repository.getTrending(page);
 
         if (page>=totalPage) {
-          emit(MovieLoaded(currentState.movies, hasReachedMax: true));
+          emit(
+            MovieLoaded(
+              currentState.movies,
+              hasReachedMax: true,
+              isLoadingMore: false,
+            ),
+          );
         } else {
           emit(
             MovieLoaded(
               [...currentState.movies, ...newMovies],
               hasReachedMax: false,
+              isLoadingMore: false,
             ),
           );
         }
       } catch (e) {
+        emit(
+          MovieLoaded(
+            currentState.movies,
+            hasReachedMax: currentState.hasReachedMax,
+            isLoadingMore: false,
+          ),
+        );
         emit(MovieError(e.toString()));
       }
 

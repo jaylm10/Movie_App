@@ -6,6 +6,7 @@ class Movie {
   final String overview;
   final String lan;
   final String rel_date;
+  final List<int> genreIds;
 
   Movie({
     required this.id,
@@ -15,6 +16,7 @@ class Movie {
     required this.overview,
     required this.lan,
     required this.rel_date,
+    required this.genreIds,
   });
 
   factory Movie.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class Movie {
       overview: json['overview'] ?? '',
       lan: json['original_language'] ?? '',
       rel_date: json['release_date'] ?? '',
+      genreIds: List<int>.from(json['genre_ids'] ?? []),
     );
   }
 
@@ -38,6 +41,7 @@ class Movie {
       'overview': overview,
       'lan': lan,
       'rel_date': rel_date,
+      'genre_ids':genreIds,
     };
   }
 
@@ -50,6 +54,7 @@ class Movie {
       overview: map['overview'] ?? '',
       lan: map['lan'] ?? '',
       rel_date: map['rel_date'] ?? '',
+      genreIds:List<int>.from(map['genre_ids'] ?? []),
     );
   }
 }
