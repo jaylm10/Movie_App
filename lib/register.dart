@@ -125,7 +125,7 @@ class _RegisterState extends State<Register> {
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Email can not be null';
+                        return 'Email can not be empty';
                       }
 
                       final emailRegex = RegExp(

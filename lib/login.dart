@@ -95,7 +95,7 @@ class _LoginState extends State<Login> {
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Email can not be null';
+                        return 'Email can not be empty';
                       }
                       final emailRegex = RegExp(
                         r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
@@ -149,7 +149,7 @@ class _LoginState extends State<Login> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Password can not be null';
+                        return 'Password can not be empty';
                       }
                       return null;
                     },
