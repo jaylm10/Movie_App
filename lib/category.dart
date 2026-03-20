@@ -43,11 +43,22 @@ const List<IconData> genreIcons = [
   Icons.landscape,
 ];
 
-class Category extends StatelessWidget {
+class Category extends StatefulWidget  {
   const Category({super.key});
 
   @override
+  State<Category> createState() => _CategoryState();
+}
+
+class _CategoryState extends State<Category> with AutomaticKeepAliveClientMixin {
+
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Category', style: TextStyle(color: Colors.white)),

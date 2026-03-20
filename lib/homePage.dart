@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
 
   Future<void> _onRefresh() async {
@@ -20,6 +20,9 @@ class _HomePageState extends State<HomePage> {
     movieBloc.add(FetchMovies(forceRefresh: true));
     await movieBloc.stream.firstWhere((state) => state is! MovieLoading);
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -43,6 +46,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text(

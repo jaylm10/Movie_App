@@ -13,7 +13,7 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClientMixin {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -21,6 +21,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool isEditing = false;
 
+
+
+  @override
+  bool get wantKeepAlive => true;
   @override
   void initState() {
     super.initState();
@@ -69,186 +73,214 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget buildField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextField(
-        controller: controller,
-        enabled: isEditing,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      ),
-    );
-  }
+  // Widget buildField(String label, TextEditingController controller) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 10),
+  //     child: TextField(
+  //       controller: controller,
+  //       enabled: isEditing,
+  //       decoration: InputDecoration(
+  //         labelText: label,
+  //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ProfileBloc, ProfileState>(
-      listener: (context, state) {
-        if (state is ProfileCompleted) {
-          nameController.text = state.name.isNotEmpty
-              ? state.name
-              : nameController.text;
-          mobileController.text = state.mobile.isNotEmpty
-              ? state.mobile
-              : mobileController.text;
-          emailController.text = state.email.isNotEmpty
-              ? state.email
-              : emailController.text;
-          bioController.text = state.bio.isNotEmpty
-              ? state.bio
-              : bioController.text;
-
-          if (isEditing) {
-            setState(() {
-              isEditing = false;
-            });
-          }
-        }
+    super.build(context);
+    return GestureDetector(
+      onTap: (){
+        FocusScope.of(context).unfocus();
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile', style: TextStyle(color: Colors.white)),
-          backgroundColor: Colors.red,
-          centerTitle: true,
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                
+      child: BlocListener<ProfileBloc, ProfileState>(
+        listener: (context, state) {
+          if (state is ProfileCompleted) {
+            nameController.text = state.name.isNotEmpty
+                ? state.name
+                : nameController.text;
+            mobileController.text = state.mobile.isNotEmpty
+                ? state.mobile
+                : mobileController.text;
+            emailController.text = state.email.isNotEmpty
+                ? state.email
+                : emailController.text;
+            bioController.text = state.bio.isNotEmpty
+                ? state.bio
+                : bioController.text;
+      
+            if (isEditing) {
+              setState(() {
+                isEditing = false;
+              });
+            }
+          }
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Profile', style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.red,
+            centerTitle: true,
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+      
+                  TextField(
+                    controller: nameController,
+                    enabled: isEditing,
+                    decoration: InputDecoration(
+                      labelText: "Name",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+      
+                  TextField(
+                    keyboardType: TextInputType.phone,
+                    controller: mobileController,
+                    enabled: isEditing,
+                    decoration: InputDecoration(
+                      labelText: "Mobile",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: emailController,
+                    enabled: false,
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: bioController,
+                    enabled: isEditing,
+                    decoration: InputDecoration(
+                      labelText: "Bio",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+      
+                  // buildField("Name", nameController),
+                  // buildField("Mobile", mobileController),
+                  // buildField("Email", emailController),
+                  // buildField("Bio", bioController),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (isEditing) {
+                          saveData();
+                        } else {
+                          setState(() {
+                            isEditing = true;
+                          });
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      child: Text(isEditing ? "Save" : "Edit"),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const FavPage()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black87,
+                      ),
+                      child: const Text("Favorites"),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
 
-                TextField(
-                  controller: nameController,
-                  enabled: isEditing,
-                  decoration: InputDecoration(
-                    labelText: "Name",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                   SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      
+                      onPressed: () {
+                        context.read<AuthBloc>().add(LogoutEvent());
+                          
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (_) => const AuthGate()),
+                          (route) => false,
+                        );
+                      },
+                      child: const Text('Log out'),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
 
-                TextField(
-                  keyboardType:TextInputType.phone,
-                  controller: mobileController,
-                  enabled: isEditing,
-                  decoration: InputDecoration(
-                    labelText: "Mobile",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: emailController,
-                  enabled: false,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: bioController,
-                  enabled: isEditing,
-                  decoration: InputDecoration(
-                    labelText: "Bio",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-
-                // buildField("Name", nameController),
-                // buildField("Mobile", mobileController),
-                // buildField("Email", emailController),
-                // buildField("Bio", bioController),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (isEditing) {
-                        saveData();
-                      } else {
-                        setState(() {
-                          isEditing = true;
-                        });
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                    ),
-                    child: Text(isEditing ? "Save" : "Edit"),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const FavPage()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black87,
-                    ),
-                    child: const Text("Favorites"),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("Delete Account"),
-                          content: const Text(
-                            "Are you sure you want to delete your account? This action cannot be undone.",
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Delete Account"),
+                            content: const Text(
+                              "Are you sure you want to delete your account? This action cannot be undone.",
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text(
+                                  "No",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text(
+                                  "Yes",
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
                           ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: const Text(
-                                "No",
-                                style: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              child: const Text(
-                                "Yes",
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-
-                      if (confirm == true) {
-                        deleteAccount();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
+                        );
+      
+                        if (confirm == true) {      
+                          deleteAccount();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                      ),
+                      child: const Text("Delete Account"),
                     ),
-                    child: const Text("Delete Account"),
                   ),
-                ),
-              ],
+
+                  const SizedBox(height: 10,),
+      
+                 
+                ],
+              ),
             ),
           ),
         ),

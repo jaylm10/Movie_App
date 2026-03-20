@@ -10,46 +10,40 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
 
-   int _currentIndex = 0;
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const Category(),
-    const ProfilePage(),
-  ];
+   late TabController _tabController;
 
-  
+   @override
+  void initState() {
+    
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
 
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       
-      body: IndexedStack(index: _currentIndex, children: _pages),
-      bottomNavigationBar: BottomNavigationBar(
-        
-        currentIndex: _currentIndex,
-        onTap: (value) {
-          setState(() {
-            _currentIndex = value;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: "Category",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Profile",
-          ),
-        ],),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+        HomePage(),
+        Category(),
+        ProfilePage(),
+      ]),
+      bottomNavigationBar: Material(
+        color: Colors.white,
+        child: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.home),     text: "Home"),
+            Tab(icon: Icon(Icons.category), text: "Category"),
+            Tab(icon: Icon(Icons.person),   text: "Profile"),
+          ]),
+      ),
     );
   }
 }
